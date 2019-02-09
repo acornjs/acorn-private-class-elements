@@ -24,6 +24,16 @@ module.exports = function(Parser) {
   }
 
   Parser = class extends Parser {
+    _branch() {
+      this.__branch = this.__branch || new Parser({ecmaVersion: this.options.ecmaVersion}, this.input)
+      this.__branch.end = this.end
+      this.__branch.pos = this.pos
+      this.__branch.type = this.type
+      this.__branch.value = this.value
+      this.__branch.containsEsc = this.containsEsc
+      return this.__branch
+    }
+
     parsePrivateClassElementName(element) {
       element.computed = false
       element.key = this.parsePrivateName()
