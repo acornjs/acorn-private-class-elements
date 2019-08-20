@@ -27,6 +27,6 @@
     "eslint-plugin-node": "^8.0.1"
   },
   "dependencies": {
-    "mocha": "^5.2.0"
+    "mocha": "^6.2.0"
   }
 }
