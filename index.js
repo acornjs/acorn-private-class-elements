@@ -1,7 +1,9 @@
 "use strict"
 
 const acorn = require("acorn")
-if (acorn.version.indexOf("6.") != 0 || acorn.version.indexOf("6.0.") == 0) {
+const semver = require("semver")
+
+if (semver.satisfies(acorn.version, '6.1.0')) {
   throw new Error(`acorn-private-class-elements requires acorn@^6.1.0, not ${acorn.version}`)
 }
 const tt = acorn.tokTypes
