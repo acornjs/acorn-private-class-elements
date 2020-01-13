@@ -24,9 +24,9 @@
   "devDependencies": {
     "acorn": "^6.1.0",
     "eslint": "^5.13.0",
-    "eslint-plugin-node": "^8.0.1"
+    "eslint-plugin-node": "^8.0.1",
+    "mocha": "^5.2.0"
   },
   "dependencies": {
-    "mocha": "^5.2.0"
   }
 }
