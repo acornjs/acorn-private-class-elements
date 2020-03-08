@@ -1,26 +1,16 @@
 "use strict"
 
-const acorn = require("acorn")
-if (acorn.version.indexOf("6.") != 0 && acorn.version.indexOf("6.0.") == 0 && acorn.version.indexOf("7.") != 0) {
-  throw new Error(`acorn-private-class-elements requires acorn@^6.1.0 or acorn@7.0.0, not ${acorn.version}`)
-}
-const tt = acorn.tokTypes
-const TokenType = acorn.TokenType
-
 module.exports = function(Parser) {
+  const acorn = Parser.acorn
+  if (acorn.version.indexOf("6.") != 0 && acorn.version.indexOf("6.0.") == 0 && acorn.version.indexOf("7.") != 0) {
+    throw new Error(`acorn-private-class-elements requires acorn@^6.1.0 or acorn@7.0.0, not ${acorn.version}`)
+  }
+  const tt = acorn.tokTypes
+  const TokenType = acorn.TokenType
+
   // Only load this plugin once.
   if (Parser.prototype.parsePrivateName) {
     return Parser
-  }
-
-  // Make sure `Parser` comes from the same acorn as our `tt`,
-  // otherwise the comparisons fail.
-  let cur = Parser
-  while (cur && cur !== acorn.Parser) {
-    cur = cur.__proto__
-  }
-  if (cur !== acorn.Parser) {
-    throw new Error("acorn-private-class-elements does not support mixing different acorn copies")
   }
 
   Parser = class extends Parser {
