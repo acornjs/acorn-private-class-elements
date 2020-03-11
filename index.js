@@ -98,7 +98,7 @@ module.exports = function(Parser) {
       node.computed = false
       if (this.type == this.privateNameToken) {
         node.property = this.parsePrivateName()
-        if (!this._privateBoundNamesStack.length || !this._privateBoundNamesStack[this._privateBoundNamesStack.length - 1][node.property.name]) {
+        if (this._privateBoundNamesStack && (!this._privateBoundNamesStack.length || !this._privateBoundNamesStack[this._privateBoundNamesStack.length - 1][node.property.name])) {
           this._unresolvedPrivateNamesStack[this._unresolvedPrivateNamesStack.length - 1][node.property.name] = node.property.start
         }
       } else {
