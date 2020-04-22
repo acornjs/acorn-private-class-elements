@@ -1,3 +1,7 @@
+## 0.2.4 (2020-04-22)
+
+* Don't allow private element access on `super`
+
 ## 0.2.3 (2020-04-22)
 
 (Skipped 0.2.1 and 0.2.2 because I accidentally called 0.2.0 0.2.2 in git)
