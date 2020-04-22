@@ -103,6 +103,9 @@ module.exports = function(Parser) {
       node.object = base
       node.computed = false
       if (this.type == this.privateNameToken) {
+        if (base.type == "Super") {
+          this.raise(this.start, "Cannot access private element on super")
+        }
         node.property = this.parsePrivateName()
         if (!this._privateBoundNamesStack.length || !this._privateBoundNamesStack[this._privateBoundNamesStack.length - 1][node.property.name]) {
           this._unresolvedPrivateNamesStack[this._unresolvedPrivateNamesStack.length - 1][node.property.name] = node.property.start
