@@ -1,11 +1,25 @@
 "use strict"
 
-const acorn = require("acorn")
-if (acorn.version.indexOf("6.") != 0 && acorn.version.indexOf("6.0.") == 0 && acorn.version.indexOf("7.") != 0) {
-  throw new Error(`acorn-private-class-elements requires acorn@^6.1.0 or acorn@7.0.0, not ${acorn.version}`)
+const getPrototype = Object.getPrototypeOf || (o => o.__proto__)
+
+const getAcorn = Parser => {
+  if (Parser.acorn) return Parser.acorn
+
+  const acorn = require("acorn")
+
+  if (acorn.version.indexOf("6.") != 0 && acorn.version.indexOf("6.0.") == 0 && acorn.version.indexOf("7.") != 0) {
+    throw new Error(`acorn-private-class-elements requires acorn@^6.1.0 or acorn@7.0.0, not ${acorn.version}`)
+  }
+
+  // Make sure `Parser` comes from the same acorn as we `require`d,
+  // otherwise the comparisons fail.
+  for (let cur = Parser; cur && cur !== acorn.Parser; cur = getPrototype(cur)) {
+    if (cur !== acorn.Parser) {
+      throw new Error("acorn-private-class-elements does not support mixing different acorn copies")
+    }
+  }
+  return acorn
 }
-const tt = acorn.tokTypes
-const TokenType = acorn.TokenType
 
 module.exports = function(Parser) {
   // Only load this plugin once.
@@ -13,15 +27,7 @@ module.exports = function(Parser) {
     return Parser
   }
 
-  // Make sure `Parser` comes from the same acorn as our `tt`,
-  // otherwise the comparisons fail.
-  let cur = Parser
-  while (cur && cur !== acorn.Parser) {
-    cur = cur.__proto__
-  }
-  if (cur !== acorn.Parser) {
-    throw new Error("acorn-private-class-elements does not support mixing different acorn copies")
-  }
+  const acorn = getAcorn(Parser)
 
   Parser = class extends Parser {
     _branch() {
@@ -90,7 +96,7 @@ module.exports = function(Parser) {
 
     // Parse private element access
     parseSubscript(base, startPos, startLoc, noCalls, maybeAsyncArrow) {
-      if (!this.eat(tt.dot)) {
+      if (!this.eat(acorn.tokTypes.dot)) {
         return super.parseSubscript(base, startPos, startLoc, noCalls, maybeAsyncArrow)
       }
       let node = this.startNodeAt(startPos, startLoc)
@@ -118,6 +124,6 @@ module.exports = function(Parser) {
       return _return
     }
   }
-  Parser.prototype.privateNameToken = new TokenType("privateName")
+  Parser.prototype.privateNameToken = new acorn.TokenType("privateName")
   return Parser
 }
