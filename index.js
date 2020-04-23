@@ -45,12 +45,12 @@ module.exports = function(Parser) {
       element.key = this.parsePrivateName()
       if (element.key.name == "constructor") this.raise(element.key.start, "Classes may not have a private element named constructor")
       const accept = {get: "set", set: "get"}[element.kind]
-      const privateBoundNames = this._privateBoundNamesStack[this._privateBoundNamesStack.length - 1]
+      const privateBoundNames = this._privateBoundNames
       if (Object.prototype.hasOwnProperty.call(privateBoundNames, element.key.name) && privateBoundNames[element.key.name] !== accept) {
         this.raise(element.start, "Duplicate private element")
       }
       privateBoundNames[element.key.name] = element.kind || true
-      delete this._unresolvedPrivateNamesStack[this._unresolvedPrivateNamesStack.length - 1][element.key.name]
+      delete this._unresolvedPrivateNames[element.key.name]
       return element.key
     }
 
@@ -75,22 +75,39 @@ module.exports = function(Parser) {
 
     // Manage stacks and check for undeclared private names
     parseClass(node, isStatement) {
-      this._privateBoundNamesStack = this._privateBoundNamesStack || []
-      const privateBoundNames = Object.create(this._privateBoundNamesStack[this._privateBoundNamesStack.length - 1] || null)
-      this._privateBoundNamesStack.push(privateBoundNames)
-      this._unresolvedPrivateNamesStack = this._unresolvedPrivateNamesStack || []
-      const unresolvedPrivateNames = Object.create(null)
-      this._unresolvedPrivateNamesStack.push(unresolvedPrivateNames)
+      const oldOuterPrivateBoundNames = this._outerPrivateBoundNames
+      this._outerPrivateBoundNames = this._privateBoundNames
+      this._privateBoundNames = Object.create(this._privateBoundNames || null)
+      const oldOuterUnresolvedPrivateNames = this._outerUnresolvedPrivateNames
+      this._outerUnresolvedPrivateNames = this._unresolvedPrivateNames
+      this._unresolvedPrivateNames = Object.create(null)
+
       const _return = super.parseClass(node, isStatement)
-      this._privateBoundNamesStack.pop()
-      this._unresolvedPrivateNamesStack.pop()
-      if (!this._unresolvedPrivateNamesStack.length) {
+
+      const unresolvedPrivateNames = this._unresolvedPrivateNames
+      this._privateBoundNames = this._outerPrivateBoundNames
+      this._outerPrivateBoundNames = oldOuterPrivateBoundNames
+      this._unresolvedPrivateNames = this._outerUnresolvedPrivateNames
+      this._outerUnresolvedPrivateNames = oldOuterUnresolvedPrivateNames
+      if (!this._unresolvedPrivateNames) {
         const names = Object.keys(unresolvedPrivateNames)
         if (names.length) {
           names.sort((n1, n2) => unresolvedPrivateNames[n1] - unresolvedPrivateNames[n2])
           this.raise(unresolvedPrivateNames[names[0]], "Usage of undeclared private name")
         }
-      } else Object.assign(this._unresolvedPrivateNamesStack[this._unresolvedPrivateNamesStack.length - 1], unresolvedPrivateNames)
+      } else Object.assign(this._unresolvedPrivateNames, unresolvedPrivateNames)
+      return _return
+    }
+
+    // Class heritage is evaluated with outer private environment
+    parseClassSuper(node) {
+      const privateBoundNames = this._privateBoundNames
+      this._privateBoundNames = this._outerPrivateBoundNames
+      const unresolvedPrivateNames = this._unresolvedPrivateNames
+      this._unresolvedPrivateNames = this._outerUnresolvedPrivateNames
+      const _return = super.parseClassSuper(node)
+      this._privateBoundNames = privateBoundNames
+      this._unresolvedPrivateNames = unresolvedPrivateNames
       return _return
     }
 
@@ -107,8 +124,11 @@ module.exports = function(Parser) {
           this.raise(this.start, "Cannot access private element on super")
         }
         node.property = this.parsePrivateName()
-        if (!this._privateBoundNamesStack.length || !this._privateBoundNamesStack[this._privateBoundNamesStack.length - 1][node.property.name]) {
-          this._unresolvedPrivateNamesStack[this._unresolvedPrivateNamesStack.length - 1][node.property.name] = node.property.start
+        if (!this._privateBoundNames || !this._privateBoundNames[node.property.name]) {
+          if (!this._unresolvedPrivateNames) {
+            this.raise(node.property.start, "Usage of undeclared private name")
+          }
+          this._unresolvedPrivateNames[node.property.name] = node.property.start
         }
       } else {
         node.property = this.parseIdent(true)
