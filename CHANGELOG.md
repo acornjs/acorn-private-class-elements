@@ -1,3 +1,7 @@
+## 0.2.5 (2020-04-23)
+
+* Evaluate class heritage with outer private environment
+
 ## 0.2.4 (2020-04-22)
 
 * Don't allow private element access on `super`
