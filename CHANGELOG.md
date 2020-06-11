@@ -1,3 +1,7 @@
+## 0.2.6 (2020-06-11)
+
+* Don't break acorn's optional chaining support
+
 ## 0.2.5 (2020-04-23)
 
 * Evaluate class heritage with outer private environment
