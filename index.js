@@ -112,13 +112,26 @@ module.exports = function(Parser) {
     }
 
     // Parse private element access
-    parseSubscript(base, startPos, startLoc, noCalls, maybeAsyncArrow) {
+    parseSubscript(base, startPos, startLoc, _noCalls, _maybeAsyncArrow, _optionalChained) {
+      const optionalSupported = this.options.ecmaVersion >= 11 && acorn.tokTypes.questionDot
+      const branch = this._branch()
+      if (!(
+        (branch.eat(acorn.tokTypes.dot) || (optionalSupported && branch.eat(acorn.tokTypes.questionDot))) &&
+        branch.type == this.privateNameToken
+      )) {
+        return super.parseSubscript.apply(this, arguments)
+      }
+      let optional = false
       if (!this.eat(acorn.tokTypes.dot)) {
-        return super.parseSubscript(base, startPos, startLoc, noCalls, maybeAsyncArrow)
+        this.expect(acorn.tokTypes.questionDot)
+        optional = true
       }
       let node = this.startNodeAt(startPos, startLoc)
       node.object = base
       node.computed = false
+      if (optionalSupported) {
+        node.optional = optional
+      }
       if (this.type == this.privateNameToken) {
         if (base.type == "Super") {
           this.raise(this.start, "Cannot access private element on super")
