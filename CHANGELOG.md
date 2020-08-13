@@ -1,3 +1,7 @@
+## 0.2.7 (2020-08-13)
+
+* Mark as compatible with acorn@8
+
 ## 0.2.6 (2020-06-11)
 
 * Don't break acorn's optional chaining support
