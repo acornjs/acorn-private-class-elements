@@ -5,6 +5,8 @@
   "contributors": [
     "Adrian Heine <mail@adrianheine.de>"
   ],
+  "main": "dist/acorn-private-class-elements.js",
+  "module": "dist/acorn-private-class-elements.mjs",
   "engines": {
     "node": ">=4.8.2"
   },
@@ -14,17 +16,19 @@
   },
   "license": "MIT",
   "scripts": {
+    "build": "rollup -c rollup.config.js",
     "test": "mocha",
     "lint": "eslint -c .eslintrc.json ."
   },
   "peerDependencies": {
     "acorn": "^6.1.0 || ^7 || ^8"
   },
-  "version": "0.2.7",
+  "version": "0.2.8",
   "devDependencies": {
     "acorn": "^7.0.0",
     "eslint": "^7",
     "eslint-plugin-node": "^11.0.0",
-    "mocha": "^8"
+    "mocha": "^8",
+    "rollup": "^2.10.0"
   }
 }
