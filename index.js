@@ -21,7 +21,7 @@ const getAcorn = Parser => {
   return acorn
 }
 
-module.exports = function(Parser) {
+export default function privateClassElements(Parser) {
   // Only load this plugin once.
   if (Parser.prototype.parsePrivateName) {
     return Parser
