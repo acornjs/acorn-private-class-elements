@@ -1,4 +1,4 @@
-"use strict";
+"use strict"
 
 const getPrototype = Object.getPrototypeOf || (o => o.__proto__)
 
