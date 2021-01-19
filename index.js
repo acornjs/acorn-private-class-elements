@@ -58,7 +58,7 @@ module.exports = function(Parser) {
       const node = this.startNode()
       node.name = this.value
       this.next()
-      this.finishNode(node, "PrivateName")
+      this.finishNode(node, "PrivateIdentifier")
       if (this.options.allowReserved == "never") this.checkUnreserved(node)
       return node
     }
@@ -68,7 +68,7 @@ module.exports = function(Parser) {
       if (code === 35) {
         ++this.pos
         const word = this.readWord1()
-        return this.finishToken(this.privateNameToken, word)
+        return this.finishToken(this.privateIdentifierToken, word)
       }
       return super.getTokenFromCode(code)
     }
@@ -117,7 +117,7 @@ module.exports = function(Parser) {
       const branch = this._branch()
       if (!(
         (branch.eat(acorn.tokTypes.dot) || (optionalSupported && branch.eat(acorn.tokTypes.questionDot))) &&
-        branch.type == this.privateNameToken
+        branch.type == this.privateIdentifierToken
       )) {
         return super.parseSubscript.apply(this, arguments)
       }
@@ -132,7 +132,7 @@ module.exports = function(Parser) {
       if (optionalSupported) {
         node.optional = optional
       }
-      if (this.type == this.privateNameToken) {
+      if (this.type == this.privateIdentifierToken) {
         if (base.type == "Super") {
           this.raise(this.start, "Cannot access private element on super")
         }
@@ -153,13 +153,13 @@ module.exports = function(Parser) {
     parseMaybeUnary(refDestructuringErrors, sawUnary) {
       const _return = super.parseMaybeUnary(refDestructuringErrors, sawUnary)
       if (_return.operator == "delete") {
-        if (_return.argument.type == "MemberExpression" && _return.argument.property.type == "PrivateName") {
+        if (_return.argument.type == "MemberExpression" && _return.argument.property.type == "PrivateIdentifier") {
           this.raise(_return.start, "Private elements may not be deleted")
         }
       }
       return _return
     }
   }
-  Parser.prototype.privateNameToken = new acorn.TokenType("privateName")
+  Parser.prototype.privateIdentifierToken = new acorn.TokenType("privateIdentifier")
   return Parser
 }
