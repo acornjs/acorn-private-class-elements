@@ -4,7 +4,7 @@
 
 This is a plugin for [Acorn](http://marijnhaverbeke.nl/acorn/) - a tiny, fast JavaScript parser, written completely in JavaScript.
 
-It provides helpers for implementing support for private class elements. The emitted AST follows [an ESTree proposal](https://github.com/estree/estree/pull/180).
+It provides helpers for implementing support for private class elements. The emitted AST follows the [ESTree experimental Class Features design](https://github.com/estree/estree/blob/master/experimental/class-features.md).
 
 ## License
 
