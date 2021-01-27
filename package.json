@@ -20,7 +20,7 @@
   "peerDependencies": {
     "acorn": "^6.1.0 || ^7 || ^8"
   },
-  "version": "0.2.7",
+  "version": "1.0.0",
   "devDependencies": {
     "acorn": "^7.0.0",
     "eslint": "^7",
