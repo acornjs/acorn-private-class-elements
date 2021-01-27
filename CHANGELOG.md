@@ -1,3 +1,7 @@
+## 1.0.0 (2021-01-27)
+
+* Update to ESTree consensus
+
 ## 0.2.7 (2020-08-13)
 
 * Mark as compatible with acorn@8
